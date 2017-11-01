@@ -3,4 +3,4 @@ dlib>=19.3.0
 face_recognition>=1.0.0
 asyncio>=3.4.3
 requests>=2.18.4
-
+python-dotenv>=0.7.1

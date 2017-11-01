@@ -3,8 +3,10 @@ import discord
 import face_recognition
 import json
 import logging
+import os
 import re
 import requests
+import settings
 import shutil
 import sys
 
@@ -18,9 +20,8 @@ client = discord.Client()
 if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
 
-
-TOKEN = '<REDACTED>'
-MEGA_MOD_BOT_ID = '<REDACTED>'
+TOKEN = os.environ['TOKEN']
+MEGA_MOD_BOT_ID = os.environ['MEGA_MOD_BOT_ID']
 BANNED_STRINGS = ['jon', 'wakeley','jonathan', 'wakely', 'wakefest', 'john', 'jawn', 'jun', 'wukley' ]
 BANNED_IMAGES = ['known_people/Jon Wakely.png', 'known_people/Jon Fancy.jpg']
 IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', ]
