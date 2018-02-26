@@ -102,3 +102,6 @@ ENV/
 
 # project test files
 unknown_pictures
+
+# No more mac nonsense
+.DS_Store
