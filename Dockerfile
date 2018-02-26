@@ -52,4 +52,4 @@ ADD . /app
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
-CMD python -u mega-mod-bot.py
+CMD python -u mega-mod-bot/mega-mod-bot.py
