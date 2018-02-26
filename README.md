@@ -1,2 +1,2 @@
-# mega-mod-bot
-My bot to make discord a better place
+The purpose of this bot is to hopefully stop my "friends" from posting garbage
+every minute of every waking day.

@@ -19,7 +19,6 @@ RUN apt-get install -y --fix-missing \
     libavcodec-dev \
     libavformat-dev \
     libav-tools \
-    libboost-all-dev \
     libffi-dev \
     libgtk2.0-dev \
     libjpeg-dev \
@@ -34,7 +33,7 @@ RUN apt-get install -y --fix-missing \
 
 RUN cd ~ && \
     mkdir -p dlib && \
-    git clone -b 'v19.5' --single-branch https://github.com/davisking/dlib.git dlib/ && \
+    git clone -b 'v19.9' --single-branch https://github.com/davisking/dlib.git dlib/ && \
     cd  dlib/ && \
     python3 setup.py install --yes USE_AVX_INSTRUCTIONS
 
@@ -53,4 +52,4 @@ ADD . /app
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
-CMD python -u discord-bot.py
+CMD python -u mega-mod-bot/mega-mod-bot.py
