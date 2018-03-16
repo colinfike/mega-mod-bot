@@ -17,6 +17,7 @@ RUN apt-get install -y --fix-missing \
     libgraphicsmagick1-dev \
     libatlas-dev \
     libavcodec-dev \
+    libavcodec-extra-56 \ 
     libavformat-dev \
     libav-tools \
     libffi-dev \

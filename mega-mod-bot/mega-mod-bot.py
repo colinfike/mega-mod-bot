@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This is the primary module for mega-mob-bot.
+This is the primary module for mega-mod-bot.
 
 It's primary function is to parse all messages, identify ones that are relevant
 to mega-mod-bot and dispatch them accordingly. It handles all text and voice
@@ -11,6 +11,7 @@ import discord
 import logging
 import os
 from censor import contains_banned_content
+from commands.ripsound import execute_ripsound
 
 
 logging.basicConfig(level=logging.INFO)
@@ -40,7 +41,7 @@ async def on_message(message):
         return None
 
     if message.content.startswith(COMMAND_SYMBOL):
-        resolve_command(message)
+        execute_command(message)
     else:
         await remove_banned_content(message)
 
@@ -52,11 +53,13 @@ async def remove_banned_content(message):
         await remove_message(message)
 
 
-def resolve_command(message):
-    """Tokenize and resolve command string."""
+def execute_command(message):
+    """Tokenize and execute command string."""
     tokens = message.content[1:].split(' ')
+    # TODO: Automatically do this by pulling command names from the command dir
+    # TODO: Add error handling on invalid command
     if (tokens[0] == 'ripsound'):
-        pass
+        execute_ripsound(tokens)
 
 
 async def send_message(channel, message_string):
