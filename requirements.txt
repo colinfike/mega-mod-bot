@@ -4,3 +4,5 @@ face_recognition>=1.0.0
 asyncio>=3.4.3
 requests>=2.18.4
 python-dotenv>=0.7.1
+pydub>=0.21.0
+youtube_dl>=2018.3.3
