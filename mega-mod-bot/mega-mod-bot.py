@@ -58,6 +58,9 @@ def execute_command(message):
     tokens = message.content[1:].split(' ')
     # TODO: Automatically do this by pulling command names from the command dir
     # TODO: Add error handling on invalid command
+    # TODO: Returning a tuple can help us figure out if we need to send a text
+    #       or voice message while keeping this module as the main text/voice
+    #       bus.
     if (tokens[0] == 'ripsound'):
         execute_ripsound(tokens)
 
