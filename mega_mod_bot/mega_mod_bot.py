@@ -61,7 +61,7 @@ async def on_message(message):
 async def remove_banned_content(message):
     """Remove any banned content in the message."""
     if (contains_banned_content(message)):
-        await send_message(message, 'banned content')
+        await send_message(message.channel, 'banned content')
         await remove_message(message)
 
 
@@ -88,7 +88,7 @@ async def execute_command(message):
 
 async def send_message(message, message_string):
     """Send passed message to server."""
-    await client.send_message(message, message_string)
+    await client.send_message(message.channel, message_string)
 
 
 async def remove_message(message):
