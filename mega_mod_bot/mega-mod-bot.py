@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-This is the primary module for mega-mod-bot.
+This is the primary module for mega_mod_bot.
 
 It's primary function is to parse all messages, identify ones that are relevant
-to mega-mod-bot and dispatch them accordingly. It handles all text and voice
+to mega_mod_bot and dispatch them accordingly. It handles all text and voice
 responses as well. This is the bot's main interface.
+
+TODO:
+1) Implement list, play, and save Audio Clips.
+2) Update command parsing.
 """
 
+import asyncio
 import discord
 import logging
 import os
+
 from censor import contains_banned_content
 from commands.ripsound import execute_ripsound
+from commands.playsound import execute_playsound
 
 
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +30,8 @@ if not discord.opus.is_loaded():
 TOKEN = os.environ['TOKEN']
 MEGA_MOD_BOT_ID = os.environ['MEGA_MOD_BOT_ID']
 COMMAND_SYMBOL = '$'
+AUDIO_FORMAT = 'audio'
+MESSAGE_FORMAT = 'message'
 
 
 @client.event
@@ -41,7 +50,7 @@ async def on_message(message):
         return None
 
     if message.content.startswith(COMMAND_SYMBOL):
-        execute_command(message)
+        await execute_command(message)
     else:
         await remove_banned_content(message)
 
@@ -53,7 +62,7 @@ async def remove_banned_content(message):
         await remove_message(message)
 
 
-def execute_command(message):
+async def execute_command(message):
     """Tokenize and execute command string."""
     tokens = message.content[1:].split(' ')
     # TODO: Automatically do this by pulling command names from the command dir
@@ -62,12 +71,22 @@ def execute_command(message):
     #       or voice message while keeping this module as the main text/voice
     #       bus.
     if (tokens[0] == 'ripsound'):
-        execute_ripsound(tokens)
+        result = execute_ripsound(tokens)
+    elif (tokens[0] == 'playsound'):
+        result = execute_playsound(tokens)
+
+    if not result:
+        return None
+
+    if result.message_format == MESSAGE_FORMAT:
+        await send_message(message, result.message)
+    elif result.message_format == AUDIO_FORMAT:
+        await send_audio(message, result.message)
 
 
-async def send_message(channel, message_string):
+async def send_message(message, message_string):
     """Send passed message to server."""
-    await client.send_message(channel, message_string)
+    await client.send_message(message.channel, message_string)
 
 
 async def remove_message(message):
@@ -75,4 +94,14 @@ async def remove_message(message):
     await client.delete_message(message)
 
 
-client.run(TOKEN)
+async def send_audio(message, audio_clip):
+    """Play audio clip in specified voice channel."""
+    voice = await client.join_voice_channel(message.author.voice.voice_channel)
+    player = voice.create_ffmpeg_player(audio_clip, use_avconv=True)
+    player.start()
+    while not player.is_done():
+        await asyncio.sleep(1)
+    await voice.disconnect()
+
+if __name__ == '__main__':
+    client.run(TOKEN)
