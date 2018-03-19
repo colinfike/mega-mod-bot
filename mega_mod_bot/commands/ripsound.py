@@ -55,7 +55,7 @@ def execute_ripsound(tokens):
                           end_time_ms)
     os.remove(audio_location)
     return ResponseTuple(
-        message='Sound clip save.',
+        message='Sound clip saved.',
         message_format=MESSAGE_FORMAT,
     )
 
