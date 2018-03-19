@@ -20,10 +20,12 @@ TODO:
 import youtube_dl
 import os
 
+from collections import namedtuple
 from pydub import AudioSegment
 
-
+MESSAGE_FORMAT = 'message'
 DOWNLOAD_LOCATION = 'sound_clips/'
+ResponseTuple = namedtuple('ResponseTuple', 'message message_format')
 
 
 def execute_ripsound(tokens):
@@ -52,6 +54,10 @@ def execute_ripsound(tokens):
     trim_and_export_audio(audio_location, clip_name, start_time_ms,
                           end_time_ms)
     os.remove(audio_location)
+    return ResponseTuple(
+        message='Sound clip saved.',
+        message_format=MESSAGE_FORMAT,
+    )
 
 
 def trim_and_export_audio(save_location, clip_name, start_ms, end_ms):
