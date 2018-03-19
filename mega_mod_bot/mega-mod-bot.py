@@ -9,6 +9,8 @@ responses as well. This is the bot's main interface.
 TODO:
 1) Implement list, play, and save Audio Clips.
 2) Update command parsing.
+3) Add caching on downloaded youtube videos.
+4) Update ripsound so it doesn't block.
 """
 
 import asyncio
@@ -19,6 +21,7 @@ import os
 from censor import contains_banned_content
 from commands.ripsound import execute_ripsound
 from commands.playsound import execute_playsound
+from commands.listsounds import execute_listsounds
 
 
 logging.basicConfig(level=logging.INFO)
@@ -74,9 +77,8 @@ async def execute_command(message):
         result = execute_ripsound(tokens)
     elif (tokens[0] == 'playsound'):
         result = execute_playsound(tokens)
-
-    if not result:
-        return None
+    elif (tokens[0] == 'listsounds'):
+        result = execute_listsounds(tokens)
 
     if result.message_format == MESSAGE_FORMAT:
         await send_message(message, result.message)
