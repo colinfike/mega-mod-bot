@@ -85,6 +85,8 @@ async def execute_command(message):
     elif result.message_format == AUDIO_FORMAT:
         await send_audio(message, result.message)
 
+    await remove_message(message)
+
 
 async def send_message(message, message_string):
     """Send passed message to server."""
