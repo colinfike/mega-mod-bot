@@ -13,19 +13,15 @@ Sample listsounds command:
 import os
 import re
 
-from collections import namedtuple
-
-AUDIO_FORMAT = 'audio'
-MESSAGE_FORMAT = 'message'
-SOUND_DIRECTORY = './sound_clips/'
-ResponseTuple = namedtuple('ResponseTuple', 'message message_format')
+import constants
+from namedtuples import ResponseTuple
 
 
 def execute_listsounds(tokens):
     """Return a ResponseTuple with a list of available sounds."""
     available_sounds = [re.sub('\..+', '', file_name) 
-                        for file_name in os.listdir(SOUND_DIRECTORY)]
+                        for file_name in os.listdir(constants.SOUND_DIRECTORY)]
     return ResponseTuple(
         message="Available sounds are: " + ', '.join(available_sounds),
-        message_format=MESSAGE_FORMAT,
+        message_format=constants.TEXT_FORMAT,
     )

@@ -1,8 +1,8 @@
-face_recognition_models>=0.3.0
+asyncio>=3.4.3
 dlib>=19.3.0
 face_recognition>=1.0.0
-asyncio>=3.4.3
-requests>=2.18.4
+face_recognition_models>=0.3.0
 python-dotenv>=0.7.1
 pydub>=0.21.0
+requests>=2.18.4
 youtube_dl>=2018.3.3

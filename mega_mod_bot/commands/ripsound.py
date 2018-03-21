@@ -16,16 +16,13 @@ TODO:
     1) Add overwrite protection.
     2) Persist file names once we use some persistent storage.
 """
-
-import youtube_dl
 import os
 
-from collections import namedtuple
 from pydub import AudioSegment
+import youtube_dl
 
-MESSAGE_FORMAT = 'message'
-DOWNLOAD_LOCATION = 'sound_clips/'
-ResponseTuple = namedtuple('ResponseTuple', 'message message_format')
+import constants
+from namedtuples import ResponseTuple
 
 
 def execute_ripsound(tokens):
@@ -35,7 +32,7 @@ def execute_ripsound(tokens):
     video_url = tokens[2]
     start_time_ms = int(tokens[3]) * 1000
     end_time_ms = int(tokens[4]) * 1000
-    save_location = DOWNLOAD_LOCATION + clip_name
+    save_location = constants.DOWNLOAD_LOCATION + clip_name
 
     # Need to use %(ext) otherwise ffmpeg bugs out. This uglies things a bit.
     options = {
@@ -56,12 +53,12 @@ def execute_ripsound(tokens):
     os.remove(audio_location)
     return ResponseTuple(
         message='Sound clip saved.',
-        message_format=MESSAGE_FORMAT,
+        message_format=constants.TEXT_FORMAT,
     )
 
 
 def trim_and_export_audio(save_location, clip_name, start_ms, end_ms):
     """Trim and export audio clip."""
     temp_sound_file = AudioSegment.from_file(save_location, format='mp3')
-    file_location = DOWNLOAD_LOCATION + clip_name + '.wav'
+    file_location = constants.DOWNLOAD_LOCATION + clip_name + '.wav'
     return temp_sound_file[start_ms:end_ms].export(file_location, format='wav')

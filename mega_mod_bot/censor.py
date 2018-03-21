@@ -4,20 +4,14 @@ This module handles checking messages for banned content.
 
 This includes strings, images, and image urls.
 """
-
-import face_recognition
 import re
-import requests
 import shutil
 import tempfile
 
+import face_recognition
+import requests
 
-BANNED_IMAGES = ['known_people/Jon Wakely.png', 'known_people/Jon Fancy.jpg']
-IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', ]
-URL_REGEX = ('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F]'
-             '[0-9a-fA-F]))+')
-BANNED_STRINGS = ['jon', 'wakeley', 'jonathan', 'wakely', 'wakefest', 'john',
-                  'jawn', 'jun', 'wukley', ]
+import constants
 
 
 def contains_banned_content(message):
@@ -36,13 +30,13 @@ def contains_banned_content(message):
 
 def parse_urls(message):
     """Return all urls for in the message."""
-    return re.findall(URL_REGEX, message.content)
+    return re.findall(constants.URL_REGEX, message.content)
 
 
 def contains_banned_string(message):
     """Check if a string contains any banned substrings."""
     return any(banned_string in message.content.lower()
-               for banned_string in BANNED_STRINGS)
+               for banned_string in constants.BANNED_STRINGS)
 
 
 def contains_banned_attachment(message):
@@ -67,7 +61,7 @@ def inspect_url(url):
 def is_image(url):
     """Make a HEAD request to get the content-type of the URL's content."""
     response = requests.head(url)
-    return response.headers['Content-Type'] in IMAGE_TYPES
+    return response.headers['Content-Type'] in constants.IMAGE_TYPES
 
 
 def is_banned_image(url):
@@ -77,7 +71,7 @@ def is_banned_image(url):
     shutil.copyfileobj(response.raw, temp_file)
 
     banned_encodings = []
-    for banned_image in BANNED_IMAGES:
+    for banned_image in constants.BANNED_IMAGES:
         converted_image = face_recognition.load_image_file(banned_image)
         for encoding in face_recognition.face_encodings(converted_image):
             banned_encodings.append(encoding)

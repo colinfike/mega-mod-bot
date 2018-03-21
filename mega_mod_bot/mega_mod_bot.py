@@ -12,16 +12,16 @@ TODO:
 3) Add caching on downloaded youtube videos.
 4) Update ripsound so it doesn't block.
 """
-
 import asyncio
-import discord
 import logging
-import os
+
+import discord
 
 from censor import contains_banned_content
 from commands.ripsound import execute_ripsound
 from commands.playsound import execute_playsound
 from commands.listsounds import execute_listsounds
+import constants
 
 
 logging.basicConfig(level=logging.INFO)
@@ -29,12 +29,6 @@ client = discord.Client()
 
 if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
-
-TOKEN = os.environ['TOKEN']
-MEGA_MOD_BOT_ID = os.environ['MEGA_MOD_BOT_ID']
-COMMAND_SYMBOL = '$'
-AUDIO_FORMAT = 'audio'
-MESSAGE_FORMAT = 'message'
 
 
 @client.event
@@ -49,10 +43,10 @@ async def on_message(message):
     """Parse incoming messages and dispatch them accordingly."""
     print(message.content)
 
-    if message.author.id == MEGA_MOD_BOT_ID:
+    if message.author.id == constants.MEGA_MOD_BOT_ID:
         return None
 
-    if message.content.startswith(COMMAND_SYMBOL):
+    if message.content.startswith(constants.COMMAND_SYMBOL):
         await execute_command(message)
     else:
         await remove_banned_content(message)
@@ -80,9 +74,9 @@ async def execute_command(message):
     elif (tokens[0] == 'listsounds'):
         result = execute_listsounds(tokens)
 
-    if result.message_format == MESSAGE_FORMAT:
+    if result.message_format == constants.TEXT_FORMAT:
         await send_message(message, result.message)
-    elif result.message_format == AUDIO_FORMAT:
+    elif result.message_format == constants.AUDIO_FORMAT:
         await send_audio(message, result.message)
 
     await remove_message(message)
@@ -108,4 +102,4 @@ async def send_audio(message, audio_clip):
     await voice.disconnect()
 
 if __name__ == '__main__':
-    client.run(TOKEN)
+    client.run(constants.TOKEN)
