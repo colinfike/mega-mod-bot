@@ -5,24 +5,18 @@ This is the primary module for mega_mod_bot.
 It's primary function is to parse all messages, identify ones that are relevant
 to mega_mod_bot and dispatch them accordingly. It handles all text and voice
 responses as well. This is the bot's main interface.
-
-TODO:
-1) Implement list, play, and save Audio Clips.
-2) Update command parsing.
-3) Add caching on downloaded youtube videos.
-4) Update ripsound so it doesn't block.
 """
 import asyncio
+from importlib import import_module
 import logging
 
 import discord
 
 from censor import contains_banned_content
-from commands.ripsound import execute_ripsound
-from commands.playsound import execute_playsound
-from commands.listsounds import execute_listsounds
 import constants
+from exceptions import InvalidCommandException
 
+MODULE_PATH = 'commands.'
 
 logging.basicConfig(level=logging.INFO)
 client = discord.Client()
@@ -60,26 +54,31 @@ async def remove_banned_content(message):
 
 
 async def execute_command(message):
-    """Tokenize and execute command string."""
+    """
+    Tokenize and execute command string.
+
+    This will try to import the module with the same name as the command
+    and if it exists will call the execute_command function in it. This enables
+    a very extensible structure where you can add new commands without
+    having to change anything else in the bot.
+    """
     tokens = message.content[1:].split(' ')
-    # TODO: Automatically do this by pulling command names from the command dir
-    # TODO: Add error handling on invalid command
-    # TODO: Returning a tuple can help us figure out if we need to send a text
-    #       or voice message while keeping this module as the main text/voice
-    #       bus.
-    if (tokens[0] == 'ripsound'):
-        result = execute_ripsound(tokens)
-    elif (tokens[0] == 'playsound'):
-        result = execute_playsound(tokens)
-    elif (tokens[0] == 'listsounds'):
-        result = execute_listsounds(tokens)
+    command = tokens[0]
 
-    if result.message_format == constants.TEXT_FORMAT:
-        await send_message(message, result.message)
-    elif result.message_format == constants.AUDIO_FORMAT:
-        await send_audio(message, result.message)
+    try:
+        command_module = import_module(MODULE_PATH + command)
+        result = command_module.execute_command(tokens)
+    except InvalidCommandException:
+        await send_message(message, 'Invalid Command')
+    except ModuleNotFoundError:
+        await send_message(message, 'Invalid Command')
+    else:
+        if result.message_format == constants.TEXT_FORMAT:
+            await send_message(message, result.message)
+        elif result.message_format == constants.AUDIO_FORMAT:
+            await send_audio(message, result.message)
 
-    await remove_message(message)
+        await remove_message(message)
 
 
 async def send_message(message, message_string):

@@ -17,17 +17,36 @@ TODO:
     2) Persist file names once we use some persistent storage.
 """
 import os
+import re
 
+import boto3
 from pydub import AudioSegment
 import youtube_dl
 
 import constants
+from exceptions import InvalidCommandException
 from namedtuples import ResponseTuple
 
+s3 = boto3.resource('s3')
 
-def execute_ripsound(tokens):
-    """Interface for the ripsound module."""
-    # TODO: Put in validation of the tokens.
+RIPSOUND = 'ripsound'
+TOKEN_COUNT = 5
+SOUND_TIME_LIMIT = 10
+URL_REGEX = re.compile('^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|' +
+                       'youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)' +
+                       '(\S+)?$')
+
+
+def execute_command(tokens):
+    """
+    Interface for the ripsound module.
+    
+    This function downloads the youtube video passed in, converts it, clip the
+    audio to the time desired, exports it locally, and uploads it to S3.
+    """
+    if validate_tokens(tokens):
+        raise InvalidCommandException
+
     clip_name = tokens[1]
     video_url = tokens[2]
     start_time_ms = int(tokens[3]) * 1000
@@ -48,8 +67,10 @@ def execute_ripsound(tokens):
         downloader.download([video_url])
 
     audio_location = save_location + '.mp3'
-    trim_and_export_audio(audio_location, clip_name, start_time_ms,
-                          end_time_ms)
+    sound_path = trim_and_export_audio(audio_location, clip_name,
+                                       start_time_ms,  end_time_ms)
+    s3.meta.client.upload_file(sound_path, constants.SOUND_BUCKET,
+                               clip_name + constants.SOUND_EXTENSION)
     os.remove(audio_location)
     return ResponseTuple(
         message='Sound clip saved.',
@@ -58,7 +79,18 @@ def execute_ripsound(tokens):
 
 
 def trim_and_export_audio(save_location, clip_name, start_ms, end_ms):
-    """Trim and export audio clip."""
-    temp_sound_file = AudioSegment.from_file(save_location, format='mp3')
-    file_location = constants.DOWNLOAD_LOCATION + clip_name + '.wav'
-    return temp_sound_file[start_ms:end_ms].export(file_location, format='wav')
+    """Trim and export audio clip locally."""
+    full_sound_file = AudioSegment.from_file(save_location, format='mp3')
+    audio_location = constants.DOWNLOAD_LOCATION + clip_name + '.wav'
+    full_sound_file[start_ms:end_ms].export(audio_location, format='wav')
+    return audio_location
+
+
+def validate_tokens(tokens):
+    """Validate tokens for the ripsound command."""
+    return any([
+        len(tokens) != TOKEN_COUNT,
+        not tokens[0].lower() == RIPSOUND,
+        not re.match(URL_REGEX, tokens[2]),
+        int(tokens[4]) - int(tokens[3]) > SOUND_TIME_LIMIT
+    ])

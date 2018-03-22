@@ -12,6 +12,7 @@ COMMAND_SYMBOL = '$'
 DOWNLOAD_LOCATION = 'sound_clips/'
 IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', ]
 MEGA_MOD_BOT_ID = os.environ['MEGA_MOD_BOT_ID']
+SOUND_BUCKET = 'mega-mod-bot.sound-clips'
 SOUND_DIRECTORY = './sound_clips/'
 SOUND_EXTENSION = '.wav'
 TEXT_FORMAT = 'text'

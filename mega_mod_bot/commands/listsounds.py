@@ -10,17 +10,21 @@ $listsounds
 Sample listsounds command:
 `$listsounds`
 """
-import os
 import re
+
+import boto3
 
 import constants
 from namedtuples import ResponseTuple
 
+s3 = boto3.resource('s3')
 
-def execute_listsounds(tokens):
+
+def execute_command(tokens):
     """Return a ResponseTuple with a list of available sounds."""
-    available_sounds = [re.sub('\..+', '', file_name) 
-                        for file_name in os.listdir(constants.SOUND_DIRECTORY)]
+    available_sounds = [re.sub('\..+', '', file_name.key) 
+                        for file_name
+                        in s3.Bucket(constants.SOUND_BUCKET).objects.all()]
     return ResponseTuple(
         message="Available sounds are: " + ', '.join(available_sounds),
         message_format=constants.TEXT_FORMAT,
