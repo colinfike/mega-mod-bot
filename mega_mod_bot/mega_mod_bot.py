@@ -49,8 +49,8 @@ async def on_message(message):
 async def remove_banned_content(message):
     """Remove any banned content in the message."""
     if (contains_banned_content(message)):
-        await send_message(message, 'banned content')
         await remove_message(message)
+        await send_message(message, 'banned content', time_to_delete=constants.DEFAULT_TTD)
 
 
 async def execute_command(message):
@@ -81,9 +81,12 @@ async def execute_command(message):
         await remove_message(message)
 
 
-async def send_message(message, message_string):
+async def send_message(message, message_string, time_to_delete=None):
     """Send passed message to server."""
-    await client.send_message(message.channel, message_string)
+    sent_message = await client.send_message(message.channel, message_string)
+    if time_to_delete:
+        await asyncio.sleep(time_to_delete)
+        await remove_message(sent_message)
 
 
 async def remove_message(message):
