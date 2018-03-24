@@ -11,10 +11,6 @@ $ripsound <clip_name> <youtube_URL> <start_time_seconds> <end_time_seconds>
 
 Sample Ripsound command:
 `$ripsound perfect_line https://www.youtube.com/watch?v=oYmqJl4MoNI 84 89`
-
-TODO:
-    1) Add overwrite protection.
-    2) Persist file names once we use some persistent storage.
 """
 import os
 import re

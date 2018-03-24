@@ -11,7 +11,6 @@ $playsound <clip_name>
 
 Sample Ripsound command:
 `$playsound perfect_line`
-
 """
 import boto3
 import os

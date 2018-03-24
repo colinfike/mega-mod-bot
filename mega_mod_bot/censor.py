@@ -4,14 +4,20 @@ This module handles checking messages for banned content.
 
 This includes strings, images, and image urls.
 """
+import boto3
 import re
 import shutil
 import tempfile
 
 import face_recognition
+import numpy
 import requests
+from utils import is_image
 
 import constants
+
+banned_images = []
+s3 = boto3.resource('s3')
 
 
 def contains_banned_content(message):
@@ -58,12 +64,6 @@ def inspect_url(url):
     return False
 
 
-def is_image(url):
-    """Make a HEAD request to get the content-type of the URL's content."""
-    response = requests.head(url)
-    return response.headers['Content-Type'] in constants.IMAGE_TYPES
-
-
 def is_banned_image(url):
     """Process the image to see if it contains any banned faces."""
     response = requests.get(url, stream=True)
@@ -84,3 +84,19 @@ def is_banned_image(url):
             return True
 
     return False
+
+
+def append_new_encoding(encoding):
+    """Append new face encoding into in-memory storage."""
+    banned_images.append(encoding)
+
+
+def load_banned_images():
+    """Load any face encodings from S3 into memory."""
+    bucket = s3.Bucket(constants.ENCODING_BUCKET)
+    for file in bucket.objects.all():
+        with tempfile.TemporaryFile() as temp_file:
+            bucket.download_fileobj(file.key, temp_file)
+            temp_file.seek(0)
+            banned_images.append(numpy.load(temp_file))
+            

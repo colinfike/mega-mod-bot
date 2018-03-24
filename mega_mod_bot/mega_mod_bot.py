@@ -12,7 +12,7 @@ import logging
 
 import discord
 
-from censor import contains_banned_content
+from censor import contains_banned_content, load_banned_images
 import constants
 from exceptions import InvalidCommandException
 
@@ -20,6 +20,7 @@ MODULE_PATH = 'commands.'
 
 logging.basicConfig(level=logging.INFO)
 client = discord.Client()
+load_banned_images()
 
 if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
@@ -98,6 +99,7 @@ async def send_audio(message, audio_clip):
     """Play audio clip in specified voice channel."""
     voice = await client.join_voice_channel(message.author.voice.voice_channel)
     player = voice.create_ffmpeg_player(audio_clip, use_avconv=True)
+    player.volume = 0.4
     player.start()
     while not player.is_done():
         await asyncio.sleep(1)
