@@ -51,7 +51,8 @@ async def remove_banned_content(message):
     """Remove any banned content in the message."""
     if (contains_banned_content(message)):
         await remove_message(message)
-        await send_message(message, 'banned content', time_to_delete=constants.DEFAULT_TTD)
+        await send_message(message, 'banned content', 
+                           time_to_delete=constants.DEFAULT_TTD)
 
 
 async def execute_command(message):
