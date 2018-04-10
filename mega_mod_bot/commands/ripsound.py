@@ -78,8 +78,15 @@ def trim_and_export_audio(save_location, clip_name, start_ms, end_ms):
     """Trim and export audio clip locally."""
     full_sound_file = AudioSegment.from_file(save_location, format='mp3')
     audio_location = constants.DOWNLOAD_LOCATION + clip_name + '.wav'
+    full_sound_file = match_target_amplitude(full_sound_file)
     full_sound_file[start_ms:end_ms].export(audio_location, format='wav')
     return audio_location
+
+
+def match_target_amplitude(sound):
+    """Apply gain to the sound to hit desired volume."""
+    change_in_dBFS = constants.TARGET_DBFS - sound.dBFS
+    return sound.apply_gain(change_in_dBFS)
 
 
 def validate_tokens(tokens):

@@ -16,6 +16,7 @@ MEGA_MOD_BOT_ID = os.environ['MEGA_MOD_BOT_ID']
 SOUND_BUCKET = 'mega-mod-bot.sound-clips'
 SOUND_DIRECTORY = './sound_clips/'
 SOUND_EXTENSION = '.wav'
+TARGET_DBFS = -30
 TEXT_FORMAT = 'text'
 DEFAULT_TTD = 5
 TOKEN = os.environ['TOKEN']

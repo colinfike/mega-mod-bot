@@ -64,7 +64,7 @@ async def execute_command(message):
     a very extensible structure where you can add new commands without
     having to change anything else in the bot.
     """
-    tokens = message.content[1:].split(' ')
+    tokens = message.content[1:].split()
     command = tokens[0]
 
     try:
@@ -100,7 +100,6 @@ async def send_audio(message, audio_clip):
     """Play audio clip in specified voice channel."""
     voice = await client.join_voice_channel(message.author.voice.voice_channel)
     player = voice.create_ffmpeg_player(audio_clip, use_avconv=True)
-    player.volume = 0.4
     player.start()
     while not player.is_done():
         await asyncio.sleep(1)

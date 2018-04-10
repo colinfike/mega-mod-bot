@@ -70,16 +70,10 @@ def is_banned_image(url):
     temp_file = tempfile.TemporaryFile()
     shutil.copyfileobj(response.raw, temp_file)
 
-    banned_encodings = []
-    for banned_image in constants.BANNED_IMAGES:
-        converted_image = face_recognition.load_image_file(banned_image)
-        for encoding in face_recognition.face_encodings(converted_image):
-            banned_encodings.append(encoding)
-
     suspect_image = face_recognition.load_image_file(temp_file)
     for suspect_encoding in face_recognition.face_encodings(suspect_image):
-        results = face_recognition.compare_faces(
-            banned_encodings, suspect_encoding)
+        results = face_recognition.compare_faces(banned_images,
+                                                 suspect_encoding)
         if (any(results)):
             return True
 
@@ -98,5 +92,4 @@ def load_banned_images():
         with tempfile.TemporaryFile() as temp_file:
             bucket.download_fileobj(file.key, temp_file)
             temp_file.seek(0)
-            banned_images.append(numpy.load(temp_file))
-            
+            append_new_encoding(numpy.load(temp_file))
